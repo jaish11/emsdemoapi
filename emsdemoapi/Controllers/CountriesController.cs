@@ -1,5 +1,6 @@
 ﻿using emsdemoapi.Data;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Immutable;
 
 namespace emsdemoapi.Controllers
 {
@@ -16,7 +17,8 @@ namespace emsdemoapi.Controllers
         [HttpGet]
         public IActionResult GetAllCountry()
         {
-            return Ok(_context.Countries.ToList());
+            List<Country> countryList = _context.Countries.ToList();
+            return Ok(countryList);
         }
 
         [HttpGet]
