@@ -1,0 +1,30 @@
+﻿@page "/books/edit/{Id:int}"
+@rendermode InteractiveServer
+
+@using EmsDemoBlazer.Models
+@using EmsDemoBlazer.Services
+@inject BookApiService BookService
+@inject NavigationManager NavigationManager
+
+<h3>Edit Book</h3>
+
+<input class="form-control" @bind="book.Name" />
+<br />
+
+<button class="btn btn-success" @onclick="Update">Update</button>
+
+@code {
+    [Parameter] public int Id { get; set; }
+    Book book = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        book = await BookService.GetBookById(Id);
+    }
+
+    async Task Update()
+    {
+        await BookService.UpdateBook(book);
+        NavigationManager.NavigateTo("/books");
+    }
+}

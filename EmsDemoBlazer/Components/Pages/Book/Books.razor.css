@@ -1,0 +1,24 @@
+﻿.books-layout {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+}
+
+.books-form {
+    width: 30%;
+}
+
+.books-table {
+    width: 70%;
+}
+
+@media (max-width: 992px) {
+    .books-layout {
+        flex-direction: column;
+    }
+
+    .books-form,
+    .books-table {
+        width: 100%;
+    }
+}

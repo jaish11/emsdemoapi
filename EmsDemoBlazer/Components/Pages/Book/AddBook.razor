@@ -1,0 +1,24 @@
+﻿@page "/books/add"
+@rendermode InteractiveServer
+
+@using EmsDemoBlazer.Models
+@using EmsDemoBlazer.Services
+@inject BookApiService BookService
+@inject NavigationManager NavigationManager
+
+<h3>Add Book</h3>
+
+<input class="form-control" @bind="book.Name" placeholder="Book Name" />
+<br />
+
+<button class="btn btn-success" @onclick="Save">Save</button>
+
+@code {
+    Book book = new();
+
+    async Task Save()
+    {
+        await BookService.AddBook(book);
+        NavigationManager.NavigateTo("/books");
+    }
+}

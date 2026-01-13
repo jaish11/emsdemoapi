@@ -1,0 +1,143 @@
+﻿@page "/books"
+@rendermode InteractiveServer
+@using System.ComponentModel.DataAnnotations
+@using EmsDemoBlazer.Models
+@using EmsDemoBlazer.Services
+@inject BookApiService BookService
+@inject IJSRuntime JS
+
+<h3>Books</h3>
+
+<!-- ADD / EDIT FORM -->
+<div class="books-layout">
+
+    <!-- LEFT: FORM -->
+    <div class="books-form">
+        <div class="card p-4 shadow-sm">
+            <h5 class="mb-3">@((isEdit ? "Edit Book" : "Add Book"))</h5>
+            <EditForm Model="currentBook" OnValidSubmit="Save">
+                <DataAnnotationsValidator />
+
+                <div class="mb-3">
+                    <InputText class="form-control"
+                               placeholder="Book Name"
+                               @bind-Value="currentBook.Name" />
+                    <ValidationMessage For="() => currentBook.Name" />
+                </div>
+
+                <button class="btn btn-success me-2" type="submit">
+                    @(isEdit ? "Update" : "Save")
+                </button>
+
+                @if (isEdit)
+                {
+                    <button type="button"
+                            class="btn btn-outline-secondary mt-2"
+                            @onclick="CancelEdit">
+                        Cancel
+                    </button>
+                }
+            </EditForm>
+
+        </div>
+    </div>
+
+    <!-- RIGHT: TABLE -->
+    <div class="books-table">
+        <table class="table table-striped align-middle">
+            <thead>
+                <tr>
+                    <th style="width:60px;">S/N</th>
+                    <th>Name</th>
+                    <th style="width:180px;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (int i = 0; i < books.Count; i++)
+                {
+                    var book = books[i];
+                    <tr>
+                        <td>@(i + 1)</td>
+                        <td>@book.Name</td>
+                        <td>
+                            <button class="btn btn-warning btn-sm me-2"
+                                    @onclick="() => Edit(book)">
+                                Edit
+                            </button>
+                            <button class="btn btn-danger btn-sm"
+                                    @onclick="() => Delete(book.Id)">
+                                Delete
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+@code {
+    List<Book> books = new();
+    Book currentBook = new();
+    bool isEdit = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        books = await BookService.GetAllBooks();
+    }
+
+    async Task Save()
+    {
+        if (isEdit)
+        {
+            await BookService.UpdateBook(currentBook);
+            await JS.InvokeVoidAsync("showSuccess", "Book Updated successfully");
+        }
+        else
+        {
+            await BookService.AddBook(currentBook);
+            await JS.InvokeVoidAsync("showSuccess", "Student added successfully");
+        }
+
+        await Reload();
+        ResetForm();
+    }
+
+    void Edit(Book book)
+    {
+        currentBook = new Book
+        {
+            Id = book.Id,
+            Name = book.Name
+        };
+        isEdit = true;
+    }
+
+    async Task Delete(int id)
+    {
+        var confirmed = await JS.InvokeAsync<bool>("showConfirm");
+        if (!confirmed)
+            return;
+        await BookService.DeleteBook(id);
+        await Reload();
+        await JS.InvokeVoidAsync("showSuccess", "Student deleted successfully");
+
+    }
+
+    async Task Reload()
+    {
+        books = await BookService.GetAllBooks();
+    }
+
+    void CancelEdit()
+    {
+        ResetForm();
+    }
+
+    void ResetForm()
+    {
+        currentBook = new Book();
+        isEdit = false;
+    }
+}

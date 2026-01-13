@@ -1,6 +1,6 @@
-﻿using emsdemoapi.Data;
+﻿using emsdemoapi.Data.Entities;
+using emsdemoapi.Data.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Immutable;
 
 namespace emsdemoapi.Controllers
 {
@@ -8,50 +8,84 @@ namespace emsdemoapi.Controllers
     [ApiController]
     public class CountriesController : ControllerBase
     {
-        private readonly AppDbContext _context;
-        public CountriesController(AppDbContext context)
+        //Using Generic 
+        private readonly IGeneric<Country> _countries;
+        public CountriesController(IGeneric<Country> countries)
         {
-            _context = context;            
+            _countries = countries;
         }
 
         [HttpGet]
-        public IActionResult GetAllCountry()
+        [ResponseCache(Duration = 30)]
+        public async Task<IActionResult> GetAll()
         {
-            List<Country> countryList = _context.Countries.ToList();
-            return Ok(countryList);
+            return Ok(await _countries.GetAllAsync());
         }
 
-        [HttpGet]
-        public IActionResult GetCountryById(int id)
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(int id)
         {
-            Country country = _context.Countries.Find(id);
-            return Ok(country);
+            return Ok(await _countries.GetByIdAsync(id));
         }
-
         [HttpPost]
-        public IActionResult AddCountry(Country country)
+        public async Task<IActionResult> Add(Country country)
         {
-            _context.Countries.Add(country);
-            _context.SaveChanges();
-            return Ok("Country Added Successfully!");
+            await _countries.AddAsync(country);
+            await _countries.SaveAsync();
+            return Ok("Added!");
         }
-
         [HttpPut]
-        public IActionResult UpdateCountry(Country country)
+        public async Task<IActionResult> Update(Country country)
         {
-            _context.Countries.Update(country);
-            _context.SaveChanges();
-            return Ok("Country Added Successfully!");
+            await _countries.UpdateAsync(country);
+            await _countries.SaveAsync();
+            return Ok("Updated!");
         }
-        
-        [HttpDelete]
-        public IActionResult DeleteCountry(int id)
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
         {
-            Country country = _context.Countries.Find(id);
+            await _countries.DeleteAsync(id);
+            await _countries.SaveAsync();
+            return Ok("Deleted!");
+        }
 
-            _context.Countries.Remove(country);
-            _context.SaveChanges();
-            return Ok("Country Added Successfully!");
-        }
+        //private readonly ICountry _country;
+        //public CountriesController(ICountry country)
+        //{
+        //    _country = country;            
+        //}
+
+        //[HttpGet]
+        //public IActionResult GetAllCountry()
+        //{
+        //    return Ok(_country.GetAllCountry());
+        //}
+
+        //[HttpGet("{id}")]
+        //public IActionResult GetCountryById(int id)
+        //{
+        //    return Ok(_country.GetCountryById(id));
+        //}
+
+        //[HttpPost]
+        //public IActionResult AddCountry(Country country)
+        //{
+        //    _country.AddCountry(country);
+        //    return Ok("Country Added Successfully!");
+        //}
+
+        //[HttpPut]
+        //public IActionResult UpdateCountry(Country country)
+        //{
+        //    _country.UpdateCountry(country);
+        //    return Ok("Country Updated Successfully!");
+        //}
+        
+        //[HttpDelete("{id}")]
+        //public IActionResult DeleteCountry(int id)
+        //{
+        //    _country.DeleteCountry(id);
+        //    return Ok("Country Delete Successfully!");
+        //}
     }
 }

@@ -1,9 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.36518.9 d17.14
+VisualStudioVersion = 17.14.36518.9
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "emsdemoapi", "emsdemoapi\emsdemoapi.csproj", "{6A6C0A33-60ED-4AC1-9142-BA8763C0E9B4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmsDemoBlazer", "EmsDemoBlazer\EmsDemoBlazer.csproj", "{D8F9FB82-7BC8-4BAC-B25D-613D5B640D9E}"
+EndProject
+Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "emsdemoapi.Database", "emsdemoapi.Database\emsdemoapi.Database.sqlproj", "{81CDF34B-FF75-4DCF-A940-D1458F70C20B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +19,16 @@ Global
 		{6A6C0A33-60ED-4AC1-9142-BA8763C0E9B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6A6C0A33-60ED-4AC1-9142-BA8763C0E9B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6A6C0A33-60ED-4AC1-9142-BA8763C0E9B4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D8F9FB82-7BC8-4BAC-B25D-613D5B640D9E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D8F9FB82-7BC8-4BAC-B25D-613D5B640D9E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D8F9FB82-7BC8-4BAC-B25D-613D5B640D9E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D8F9FB82-7BC8-4BAC-B25D-613D5B640D9E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{81CDF34B-FF75-4DCF-A940-D1458F70C20B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{81CDF34B-FF75-4DCF-A940-D1458F70C20B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{81CDF34B-FF75-4DCF-A940-D1458F70C20B}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{81CDF34B-FF75-4DCF-A940-D1458F70C20B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{81CDF34B-FF75-4DCF-A940-D1458F70C20B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{81CDF34B-FF75-4DCF-A940-D1458F70C20B}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

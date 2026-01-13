@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using emsdemoapi.Data.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace emsdemoapi.Data
 {
@@ -10,5 +11,10 @@ namespace emsdemoapi.Data
         public DbSet<State> States { get; set; }
         public DbSet<District> Districts { get; set; }
         public DbSet<Customer> Customers { get; set; }
+        public DbSet<Employee> Employees { get; set; }
+        public DbSet<Student> Students { get; set; }
+        public DbSet<Branch> Branches { get; set; }
+        public DbSet<Book> Books { get; set; }
+        public DbSet<User> Users { get; set; }
     }
 }

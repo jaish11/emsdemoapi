@@ -1,0 +1,238 @@
+﻿@page "/students"
+
+@using EmsDemoBlazer.Models
+@using EmsDemoBlazer.Services
+@inject StudentApiService StudentService
+@inject IJSRuntime JS
+
+<h3>Students</h3>
+<button class="btn btn-primary mb-3" @onclick="OpenAdd">
+    + Add Student
+</button>
+
+@if (showModal)
+{
+    <div class="modal-backdrop fade show"></div>
+
+    <div class="modal d-block" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        @(isEdit ? "Edit Student" : "Add Student")
+                    </h5>
+                    <button type="button" class="btn-close" @onclick="CloseModal"></button>
+                </div>
+                <EditForm Model="@current" OnValidSubmit="Save">
+                    <DataAnnotationsValidator />
+
+                    <div class="modal-body">
+                        <input class="form-control mb-1" placeholder="Name" @bind="current.Name" />
+                        <ValidationMessage For="@(() => current.Name)" />
+
+                        <input class="form-control mb-1" type="number" placeholder="Age" @bind="current.Age" />
+                        <ValidationMessage For="@(() => current.Age)" />
+
+                        <input class="form-control mb-1" placeholder="Email" @bind="current.Email" />
+                        <ValidationMessage For="@(() => current.Email)" />
+
+                        <input class="form-control mb-1" placeholder="Phone" @bind="current.Phone" />
+                        <ValidationMessage For="@(() => current.Phone)" />
+
+                        <input class="form-control mb-1" placeholder="City" @bind="current.City" />
+                        <ValidationMessage For="@(() => current.City)" />
+
+                        <input class="form-control mb-1" placeholder="State" @bind="current.State" />
+                        <ValidationMessage For="@(() => current.State)" />
+
+                        <input class="form-control mb-1" placeholder="Country" @bind="current.Country" />
+                        <ValidationMessage For="@(() => current.Country)" />
+                    </div>
+
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" type="button" @onclick="CloseModal">
+                            Cancel
+                        </button>
+                        <button class="btn btn-success" type="submit">
+                            @(isEdit ? "Update" : "Save")
+                        </button>
+                    </div>
+                </EditForm>
+
+                @* <EditForm Model="@current" OnValidSubmit="Save">
+                    <DataAnnotationsValidator/>
+
+
+                <div class="modal-body">
+                    <input class="form-control mb-2" placeholder="Name" @bind="current.Name" />
+                    <ValidationMessage For="@(() => current.Name)"/>
+                    <input class="form-control mb-2" type="number" placeholder="Age" @bind="current.Age" />
+                    <ValidationMessage For="@(()=> current.Age)"/>
+                    <input class="form-control mb-2" placeholder="Email" @bind="current.Email" />
+                    <ValidationMessage For="@(() => current.Email)" />
+                    <input class="form-control mb-2" placeholder="Phone" @bind="current.Phone" />
+                    <ValidationMessage For="@(() => current.Phone)" />
+                    <input class="form-control mb-2" placeholder="City" @bind="current.City" />
+                    <ValidationMessage For="@(() => current.City)" />
+                    <input class="form-control mb-2" placeholder="State" @bind="current.State" />
+                    <ValidationMessage For="@(() => current.State)" />
+                    <input class="form-control mb-2" placeholder="Country" @bind="current.Country" />
+                    <ValidationMessage For="@(() => current.Country)" />
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" @onclick="CloseModal">Cancel</button>
+                    <button class="btn btn-success" type="submit">
+                        @(isEdit ? "Update" : "Save")
+                    </button>
+                </div>
+                </EditForm> *@
+
+            </div>
+        </div>
+    </div>
+}
+
+@* <div class="card p-4 mb-4 shadow-sm">
+    <h5>@(isEdit? "Edit Student" : "Add Student")</h5>
+    <input class="form-control mb-2" placeholder="Name" @bind="current.Name" />
+    <input class="form-control mb-2" placeholder="Age" type="number" @bind="current.Age" />
+    <input class="form-control mb-2" placeholder="Email" @bind="current.Email" />
+    <input class="form-control mb-2" placeholder="Phone" @bind="current.Phone" />
+    <input class="form-control mb-2" placeholder="City" @bind="current.City" />
+    <input class="form-control mb-2" placeholder="State" @bind="current.State" />
+    <input class="form-control mb-3" placeholder="Country" @bind="current.Country" />
+
+    <button class="btn btn-success me-2" @onclick="Save">
+        @(isEdit ? "Update" : "Save")
+    </button>
+
+    @if (isEdit)
+    {
+        <button class="btn btn-secondary mt-2" @onclick="Cancel">
+            Cancel
+        </button>
+    }
+</div> *@
+
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>S/N</th>
+            <th>Name</th>
+            <th>Age</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>City</th>
+            <th>State</th>
+            <th>Country</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @for(int i = 0; i < students.Count; i++)
+        {
+            var student = students[i];
+            <tr>
+                <td>@(i + 1)</td>
+                <td>@student.Name</td>
+                <td>@student.Age</td>
+                <td>@student.Email</td>
+                <td>@student.Phone</td>
+                <td>@student.City</td>
+                <td>@student.State</td>
+                <td>@student.Country</td>
+                <td>
+                    <button class="btn btn-warning btn-sm me-2" @onclick="() => Edit(student)">Edit</button>
+                    <button class="btn btn-danger btn-sm" @onclick="() => Delete(student.Id)">Delete</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    List<Student> students = new();
+    Student current = new();
+    bool isEdit = false;
+    bool showModal = false;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        students = await StudentService.GetAll();
+    }
+
+    async Task Save()
+    {
+        if (isEdit)
+        {
+            await StudentService.Update(current);
+            await JS.InvokeVoidAsync("showSuccess", "Student updated successfully");            
+        }
+        else
+        {
+            await StudentService.Add(current);
+            await JS.InvokeVoidAsync("showSuccess", "Student added successfully");
+                       
+        }
+
+        await Reload();
+        CloseModal();
+    }
+    void OpenAdd()
+    {
+        Reset();
+        showModal = true;
+    }
+    void Edit(Student student)
+    {
+        current =  new Student
+        {
+            Id = student.Id,
+            Name = student.Name,
+            Age = student.Age,
+            Email = student.Email,
+            Phone = student.Phone,
+            City = student.City,
+            State = student.State,
+            Country = student.Country
+        };
+        isEdit = true;
+        showModal = true;
+    }
+
+    async Task Delete(int id)
+    {
+        var confirmed = await JS.InvokeAsync<bool>("showConfirm");
+
+        if (!confirmed)
+            return;
+        await StudentService.Delete(id);
+        await Reload();
+        await JS.InvokeVoidAsync("showSuccess", "Student deleted successfully");
+
+    }
+
+    async Task Reload()
+    {
+        students = await StudentService.GetAll();
+    }
+    void CloseModal()
+    {
+        showModal = false;
+        Reset();
+    }
+
+    void Cancel()
+    {
+        Reset();
+    }
+    void Reset()
+    {
+        current = new();
+        isEdit = false;
+    }
+}

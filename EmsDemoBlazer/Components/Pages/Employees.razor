@@ -1,0 +1,157 @@
+﻿@page "/employees"
+
+@using EmsDemoBlazer.Models;
+@using EmsDemoBlazer.Services
+@inject EmployeeApiService EmployeeService
+@inject IJSRuntime JS
+
+<h3>Employees</h3>
+<button class="btn btn-primary mb-3" @onclick="OpenAdd">+ Add Employee</button>
+@if (showModel)
+{
+    <div class="modal-backdrop fade show"></div>
+
+    <div class="modal d-block">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5>@(isEdit ? "Edit Employee" : "Add Employee")</h5>
+                    <button class="btn-close" @onclick="CloseModel"></button>
+                </div>
+
+                <EditForm Model="@current" OnValidSubmit="Save">
+                    <DataAnnotationsValidator />
+                    <ValidationSummary />
+
+                    <div class="modal-body">
+                        <input class="form-control mb-2" placeholder="Name"
+                               @bind="current.Name" />
+                        <ValidationMessage For="@(() => current.Name)" />
+
+                        <input class="form-control mb-2" placeholder="Position"
+                               @bind="current.Position" />
+                        <ValidationMessage For="@(() => current.Position)" />
+
+                        <input class="form-control mb-2" type="number" placeholder="Salary"
+                               @bind="current.Salary" />
+                        <ValidationMessage For="@(() => current.Salary)" />
+                    </div>
+
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" type="button" @onclick="CloseModel">
+                            Cancel
+                        </button>
+                        <button class="btn btn-success" type="submit">
+                            @(isEdit ? "Update" : "Save")
+                        </button>
+                    </div>
+                </EditForm>
+
+            </div>
+        </div>
+    </div>
+}
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>S/N</th>
+            <th>Name</th>
+            <th>Position</th>
+            <th>Salary</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @for (int i = 0; i < employees.Count; i++)
+        {
+            var emp = employees[i];
+            <tr>
+                <td>@(i + 1)</td>
+                <td>@emp.Name</td>
+                <td>@emp.Position</td>
+                <td>@emp.Salary</td>
+                <td>
+                    <button class="btn btn-warning btn-sm me-2"
+                            @onclick="() => Edit(emp)">
+                        Edit
+                    </button>
+                    <button class="btn btn-danger btn-sm"
+                            @onclick="() => Delete(emp.Id)">
+                        Delete
+                    </button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    List<Employee> employees = new();
+    Employee current = new();
+    bool isEdit = false;
+    bool showModel = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        employees = await EmployeeService.GetAll();
+    }
+
+    void OpenAdd()
+    {
+        Reset();
+        showModel = true;
+    }
+    void Edit(Employee emp)
+    {
+        current = new Employee
+        {
+            Id = emp.Id,
+            Name = emp.Name,
+            Position = emp.Position,
+            Salary = emp.Salary
+        };
+        isEdit = true;
+        showModel = true;
+    }
+    async Task Save()
+    {
+        if(isEdit)
+        {
+            await EmployeeService.Update(current);
+            await JS.InvokeVoidAsync("showSuccess", "Employee updated successfully");
+        }
+        else
+        {
+            await EmployeeService.Add(current);
+            await JS.InvokeVoidAsync("showSuccess", "Employee added successfully");
+        }
+        await Reload();
+        CloseModel();
+    }
+
+    async Task Delete(int id)
+    {
+        var confirmed = await JS.InvokeAsync<bool>("showConfirm");
+        if (!confirmed) return;
+        await EmployeeService.Delete(id);
+        await Reload();
+        await JS.InvokeVoidAsync("showSuccess", "Employee deleted successfully");
+    }
+
+    async Task Reload()
+    {
+        employees = await EmployeeService.GetAll();
+    }
+    void CloseModel()
+    {
+        showModel = false;
+        Reset();
+    }
+    void Reset()
+    {
+        current = new Employee();
+        isEdit = false;
+    }
+}
